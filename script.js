@@ -1,6 +1,38 @@
 const year = document.getElementById('year');
 if (year) year.textContent = new Date().getFullYear();
 
+const clock = document.getElementById('clock');
+const calendar = document.getElementById('calendar');
+
+function updateClock() {
+  const now = new Date();
+  if (clock) {
+    const clockText = new Intl.DateTimeFormat('zh-CN', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).format(now);
+    clock.textContent = clockText;
+    clock.dateTime = now.toISOString();
+  }
+
+  if (calendar) {
+    const solar = new Intl.DateTimeFormat('zh-CN', {
+      month: 'long', day: 'numeric', weekday: 'long'
+    }).format(now);
+    let lunar = '';
+    try {
+      lunar = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', {
+        month: 'long', day: 'numeric'
+      }).format(now);
+    } catch {
+      lunar = '';
+    }
+    calendar.textContent = lunar ? `${solar} · 农历${lunar}` : solar;
+  }
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
 const themeToggle = document.getElementById('theme-toggle');
 const themeMeta = document.querySelector('meta[name="theme-color"]');
 const themeKey = 'lin-shuiyue-theme';

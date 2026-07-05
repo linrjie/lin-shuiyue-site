@@ -6,10 +6,11 @@ $siteFiles = @(
   'index.html',
   'styles.css',
   'script.js',
-  'favicon.svg'
+  'favicon.svg',
+  'assets'
 ) | ForEach-Object { Join-Path $projectRoot $_ }
 
-$missingFiles = $siteFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) }
+$missingFiles = $siteFiles | Where-Object { -not (Test-Path -LiteralPath $_) }
 if ($missingFiles) {
   throw "缺少网站文件：$($missingFiles -join ', ')"
 }
