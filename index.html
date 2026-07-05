@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="林水月的个人小站，放着近况、喜欢的东西和一些随手记录。" />
+  <meta name="theme-color" content="#f5f0e8" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta property="og:title" content="林水月的小站" />
+  <meta property="og:description" content="欢迎来到林水月的一小块互联网角落。" />
+  <title>林水月的小站</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="#home" aria-label="返回首页">水月<span>的小站</span></a>
+    <nav aria-label="主导航">
+      <a href="#about">关于我</a>
+      <a href="#projects">随手记</a>
+      <a href="#contact">留言板</a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换月色模式" aria-pressed="false">夜</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-copy">
+        <p class="eyebrow">WELCOME TO MY LITTLE CORNER</p>
+        <h1>嗨，我是<br /><span>林水月。</span></h1>
+        <p class="intro">这里不是简历，也没有什么严肃议程。只是我的一小块互联网角落，放些近况、喜欢的东西，还有偶尔冒出来的奇怪念头。</p>
+        <div class="actions">
+          <a class="button primary" href="#projects">随便逛逛</a>
+          <a class="button secondary" href="#about">认识一下</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="core">✦</div>
+        <span class="tag tag-one">DAYDREAM</span>
+        <span class="tag tag-two">LIFE</span>
+        <span class="tag tag-three">HELLO!</span>
+      </div>
+    </section>
+
+    <section class="section about" id="about">
+      <div>
+        <p class="section-number">01 / ABOUT</p>
+        <h2>关于我</h2>
+      </div>
+      <div class="about-copy">
+        <p>我是林水月。平时喜欢发现生活里那些微不足道、但会让人开心的小事。建这个网站没什么宏大理由——就是想让朋友来的时候，有个地方能多了解我一点。</p>
+        <div class="facts">
+          <span>🌙 偶尔熬夜</span><span>🎧 随时听歌</span><span>✨ 对世界好奇</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section projects" id="projects">
+      <p class="section-number">02 / LITTLE THINGS</p>
+      <div class="section-heading">
+        <h2>最近在想</h2>
+        <p>不定期更新，也可能突然消失。</p>
+      </div>
+      <div class="project-grid">
+        <article class="project-card card-yellow">
+          <div class="project-visual">01</div>
+          <div class="project-content"><p>NOW · 进行中</p><h3>亲手搭起这个小站</h3><span>今天也在添砖加瓦</span></div>
+        </article>
+        <article class="project-card card-blue">
+          <div class="project-visual">02</div>
+          <div class="project-content"><p>FAVORITE · 收藏夹</p><h3>最近喜欢的东西</h3><span>歌、电影和一些小玩意</span></div>
+        </article>
+        <article class="project-card card-coral">
+          <div class="project-visual">03</div>
+          <div class="project-content"><p>DAILY · 碎碎念</p><h3>生活掉落的碎片</h3><span>想起来就记一点</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <p class="section-number">03 / FOR MY FRIENDS</p>
+      <h2>来都来了，<br /><span>留句话再走吧。</span></h2>
+      <p class="guestbook-note">留言会保存在当前浏览器里，适合把电脑递给朋友时一起玩。</p>
+      <form class="guestbook-form" id="guestbook-form">
+        <label>
+          <span>怎么称呼你</span>
+          <input id="guest-name" name="name" maxlength="16" placeholder="一位神秘朋友" />
+        </label>
+        <label>
+          <span>想说点什么</span>
+          <textarea id="guest-message" name="message" maxlength="120" rows="3" placeholder="水月，我来过啦……" required></textarea>
+        </label>
+        <button class="button primary" type="submit">贴到留言板上</button>
+      </form>
+      <div class="guestbook-list" id="guestbook-list" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer><p>© <span id="year"></span> 林水月的小站</p><p>写给朋友，也写给路过的你</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>
