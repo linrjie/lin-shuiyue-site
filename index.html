@@ -116,6 +116,23 @@
         <div><strong>水神小助手</strong><small>PET CONSOLE</small></div>
       </div>
       <p class="console-status" id="pet-status">芙宁娜正在欣赏月色。</p>
+      <section class="music-console" aria-label="背景音乐播放器">
+        <div class="music-now">
+          <span class="music-disc" aria-hidden="true">♪</span>
+          <div><small>NOW PLAYING</small><strong id="music-title">月下漫游</strong></div>
+        </div>
+        <input class="music-progress" id="music-progress" type="range" min="0" max="48" value="0" step="0.1" aria-label="播放进度" />
+        <div class="music-time"><span id="music-current">0:00</span><span id="music-duration">0:48</span></div>
+        <div class="music-controls">
+          <button id="music-prev" type="button" aria-label="上一首">‹</button>
+          <button class="music-play" id="music-play" type="button" aria-label="播放">▶</button>
+          <button id="music-next" type="button" aria-label="下一首">›</button>
+        </div>
+        <label class="music-volume" for="music-volume"><span aria-hidden="true">♩</span>
+          <input id="music-volume" type="range" min="0" max="1" value="0.55" step="0.01" aria-label="音量" />
+        </label>
+        <audio id="pet-audio" preload="metadata"></audio>
+      </section>
       <div class="console-actions">
         <button type="button" data-pet-action="speak">说句话</button>
         <button type="button" data-pet-action="wander">随便走走</button>

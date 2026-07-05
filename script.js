@@ -304,3 +304,110 @@ window.addEventListener('resize', () => {
 
 restorePetSettings();
 window.setTimeout(() => petSpeech?.classList.remove('is-visible'), 3600);
+
+const audio = document.getElementById('pet-audio');
+const musicConsole = document.querySelector('.music-console');
+const musicTitle = document.getElementById('music-title');
+const musicPlay = document.getElementById('music-play');
+const musicPrev = document.getElementById('music-prev');
+const musicNext = document.getElementById('music-next');
+const musicProgress = document.getElementById('music-progress');
+const musicCurrent = document.getElementById('music-current');
+const musicDuration = document.getElementById('music-duration');
+const musicVolume = document.getElementById('music-volume');
+const musicStateKey = 'lin-shuiyue-music';
+const musicTracks = [
+  { title: '月下漫游', src: 'assets/music/moonwalk.wav' },
+  { title: '水色剧场', src: 'assets/music/aqua-theatre.wav' },
+  { title: '星海晚安', src: 'assets/music/starlight-goodnight.wav' }
+];
+let musicIndex = 0;
+
+function formatAudioTime(value) {
+  if (!Number.isFinite(value)) return '0:00';
+  const minutes = Math.floor(value / 60);
+  const seconds = Math.floor(value % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+function saveMusicState() {
+  if (!audio) return;
+  try {
+    localStorage.setItem(musicStateKey, JSON.stringify({ index: musicIndex, volume: audio.volume }));
+  } catch {
+    // 本地存储不可用时继续播放，但不记忆设置。
+  }
+}
+
+function loadMusicTrack(index, autoplay = false) {
+  if (!audio) return;
+  musicIndex = (index + musicTracks.length) % musicTracks.length;
+  const track = musicTracks[musicIndex];
+  audio.src = track.src;
+  audio.load();
+  if (musicTitle) musicTitle.textContent = track.title;
+  if (musicProgress) musicProgress.value = '0';
+  if (musicCurrent) musicCurrent.textContent = '0:00';
+  saveMusicState();
+  if (autoplay) audio.play().catch(() => {});
+}
+
+if (audio) audio.volume = 0.55;
+try {
+  const savedMusic = JSON.parse(localStorage.getItem(musicStateKey));
+  if (savedMusic && Number.isInteger(savedMusic.index)) musicIndex = savedMusic.index;
+  if (audio && savedMusic && Number.isFinite(savedMusic.volume)) audio.volume = Math.max(0, Math.min(1, savedMusic.volume));
+} catch {
+  // 使用默认曲目和音量。
+}
+if (musicVolume && audio) musicVolume.value = String(audio.volume);
+loadMusicTrack(musicIndex);
+
+musicPlay?.addEventListener('click', () => {
+  if (!audio) return;
+  if (audio.paused) audio.play().catch(() => {});
+  else audio.pause();
+});
+
+musicPrev?.addEventListener('click', () => loadMusicTrack(musicIndex - 1, !audio?.paused));
+musicNext?.addEventListener('click', () => loadMusicTrack(musicIndex + 1, !audio?.paused));
+
+audio?.addEventListener('play', () => {
+  if (musicPlay) {
+    musicPlay.textContent = 'Ⅱ';
+    musicPlay.setAttribute('aria-label', '暂停');
+  }
+  musicConsole?.classList.add('is-playing');
+});
+
+audio?.addEventListener('pause', () => {
+  if (musicPlay) {
+    musicPlay.textContent = '▶';
+    musicPlay.setAttribute('aria-label', '播放');
+  }
+  musicConsole?.classList.remove('is-playing');
+});
+
+audio?.addEventListener('loadedmetadata', () => {
+  if (musicProgress) musicProgress.max = String(audio.duration || 48);
+  if (musicDuration) musicDuration.textContent = formatAudioTime(audio.duration || 48);
+});
+
+audio?.addEventListener('timeupdate', () => {
+  if (musicProgress && document.activeElement !== musicProgress) musicProgress.value = String(audio.currentTime);
+  if (musicCurrent) musicCurrent.textContent = formatAudioTime(audio.currentTime);
+});
+
+audio?.addEventListener('ended', () => loadMusicTrack(musicIndex + 1, true));
+
+musicProgress?.addEventListener('input', () => {
+  if (!audio || audio.readyState === 0) return;
+  audio.currentTime = Number(musicProgress.value);
+  if (musicCurrent) musicCurrent.textContent = formatAudioTime(audio.currentTime);
+});
+
+musicVolume?.addEventListener('input', () => {
+  if (!audio) return;
+  audio.volume = Number(musicVolume.value);
+  saveMusicState();
+});
