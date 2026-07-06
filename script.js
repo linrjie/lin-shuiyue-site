@@ -592,3 +592,238 @@ window.addEventListener('resize', () => {
     body.y = Math.min(body.y, floor - body.height);
   });
 });
+
+const siteDataKey = 'lin-shuiyue-site-data-v1';
+const defaultSiteData = {
+  profile: {
+    intro: '我是林水月。平时喜欢发现生活里那些微不足道、但会让人开心的小事。建这个网站没什么宏大理由——就是想让朋友来的时候，有个地方能多了解我一点。',
+    now: '继续完善这个写给朋友的小站',
+    snack: '薯片、巧克力和冰冰的饮料',
+    goal: '把喜欢的事慢慢做成长期习惯',
+    anime: '《葬送的芙莉莲》《孤独摇滚！》',
+    xp: '蓝白配色、反差感、优雅又有点闹腾的角色'
+  },
+  contents: [
+    { id: 'welcome-article', type: 'article', title: '这个小站为什么存在', body: '想给朋友留一个随时可以推门进来的角落，也顺便收藏那些不想忘记的瞬间。', date: '初次见面' },
+    { id: 'today-note', type: 'note', title: '今日碎碎念', body: '网页又多了一点可以亲手摆放的东西，慢慢搭建也很有意思。', date: '最近更新' },
+    { id: 'moon-image', type: 'image', title: '月夜工作台', body: '今晚的背景，以及还没有写完的故事。', image: 'assets/blog-stage-bg.png', date: '相片夹' }
+  ]
+};
+
+const aboutIntro = document.getElementById('about-intro');
+const profileFields = {
+  now: document.getElementById('profile-now'),
+  snack: document.getElementById('profile-snack'),
+  goal: document.getElementById('profile-goal'),
+  anime: document.getElementById('profile-anime'),
+  xp: document.getElementById('profile-xp')
+};
+const contentGrid = document.getElementById('content-grid');
+const contentEmpty = document.getElementById('content-empty');
+const settingsPanel = document.getElementById('site-settings');
+const settingsBackdrop = document.getElementById('settings-backdrop');
+const settingsTrigger = document.getElementById('settings-trigger');
+const settingsClose = document.getElementById('settings-close');
+const settingsStatus = document.getElementById('settings-status');
+const settingsContentList = document.getElementById('settings-content-list');
+const settingsCount = document.getElementById('settings-count');
+const profileForm = document.getElementById('profile-form');
+const contentForm = document.getElementById('content-form');
+const contentTypeLabels = { article: 'ARTICLE · 文章', note: 'NOTE · 笔记', image: 'IMAGE · 图片' };
+let settingsReturnFocus = null;
+
+function cloneDefaultSiteData() {
+  return JSON.parse(JSON.stringify(defaultSiteData));
+}
+
+function readSiteData() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(siteDataKey));
+    if (!saved?.profile || !Array.isArray(saved.contents)) return cloneDefaultSiteData();
+    return saved;
+  } catch {
+    return cloneDefaultSiteData();
+  }
+}
+
+let siteData = readSiteData();
+
+function saveSiteData(nextData) {
+  try {
+    localStorage.setItem(siteDataKey, JSON.stringify(nextData));
+    siteData = nextData;
+    return true;
+  } catch {
+    if (settingsStatus) settingsStatus.textContent = '保存失败：本地空间可能已满，请换一张更小的图片。';
+    return false;
+  }
+}
+
+function renderProfile() {
+  if (aboutIntro) aboutIntro.textContent = siteData.profile.intro;
+  Object.entries(profileFields).forEach(([key, element]) => {
+    if (element) element.textContent = siteData.profile[key];
+  });
+}
+
+function renderContents() {
+  if (!contentGrid || !settingsContentList) return;
+  contentGrid.replaceChildren();
+  settingsContentList.replaceChildren();
+  contentEmpty.hidden = siteData.contents.length > 0;
+  if (settingsCount) settingsCount.textContent = `${siteData.contents.length} ITEMS`;
+
+  siteData.contents.forEach((item) => {
+    const card = document.createElement('article');
+    card.className = 'project-card content-card';
+    card.dataset.type = item.type;
+
+    const visual = document.createElement('div');
+    visual.className = 'project-visual';
+    if (item.image) {
+      const image = document.createElement('img');
+      image.src = item.image;
+      image.alt = item.title;
+      image.loading = 'lazy';
+      visual.append(image);
+    } else {
+      visual.textContent = item.type === 'article' ? 'READ' : item.type === 'note' ? 'NOTE' : 'IMG';
+    }
+
+    const content = document.createElement('div');
+    content.className = 'project-content';
+    const type = document.createElement('p');
+    const title = document.createElement('h3');
+    const body = document.createElement('span');
+    type.textContent = `${contentTypeLabels[item.type] || 'CONTENT'} · ${item.date}`;
+    title.textContent = item.title;
+    body.textContent = item.body || '没有说明，只留下这一刻。';
+    content.append(type, title, body);
+    card.append(visual, content);
+    contentGrid.append(card);
+
+    const row = document.createElement('div');
+    row.className = 'settings-item';
+    const summary = document.createElement('div');
+    const rowTitle = document.createElement('strong');
+    const rowType = document.createElement('small');
+    const remove = document.createElement('button');
+    rowTitle.textContent = item.title;
+    rowType.textContent = contentTypeLabels[item.type] || '内容';
+    remove.type = 'button';
+    remove.dataset.removeContent = item.id;
+    remove.textContent = '删除';
+    summary.append(rowTitle, rowType);
+    row.append(summary, remove);
+    settingsContentList.append(row);
+  });
+}
+
+function fillProfileForm() {
+  if (!profileForm) return;
+  Object.entries(siteData.profile).forEach(([key, value]) => {
+    const field = profileForm.elements.namedItem(key);
+    if (field) field.value = value;
+  });
+}
+
+function openSettings() {
+  if (!settingsPanel || !settingsBackdrop) return;
+  settingsReturnFocus = document.activeElement;
+  fillProfileForm();
+  settingsBackdrop.hidden = false;
+  settingsPanel.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('settings-open');
+  requestAnimationFrame(() => settingsPanel.classList.add('is-open'));
+  settingsClose?.focus();
+}
+
+function closeSettings() {
+  if (!settingsPanel || !settingsBackdrop) return;
+  settingsPanel.classList.remove('is-open');
+  settingsPanel.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('settings-open');
+  window.setTimeout(() => { settingsBackdrop.hidden = true; }, 320);
+  settingsReturnFocus?.focus?.();
+}
+
+function readImageFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => resolve(String(reader.result)));
+    reader.addEventListener('error', reject);
+    reader.readAsDataURL(file);
+  });
+}
+
+settingsTrigger?.addEventListener('click', () => {
+  siteHeader?.classList.remove('is-expanded');
+  navPeek?.setAttribute('aria-expanded', 'false');
+  openSettings();
+});
+settingsClose?.addEventListener('click', closeSettings);
+settingsBackdrop?.addEventListener('click', closeSettings);
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && settingsPanel?.classList.contains('is-open')) closeSettings();
+});
+
+profileForm?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const data = new FormData(profileForm);
+  const nextData = {
+    ...siteData,
+    profile: Object.fromEntries(['intro', 'now', 'snack', 'goal', 'anime', 'xp'].map((key) => [key, String(data.get(key) || '').trim()]))
+  };
+  if (!saveSiteData(nextData)) return;
+  renderProfile();
+  if (settingsStatus) settingsStatus.textContent = '关于我已保存。';
+});
+
+contentForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const data = new FormData(contentForm);
+  const type = String(data.get('type'));
+  const file = data.get('imageFile');
+  let image = String(data.get('imageUrl') || '').trim();
+
+  if (file instanceof File && file.size > 0) {
+    if (file.size > 900000) {
+      if (settingsStatus) settingsStatus.textContent = '这张图片超过 900 KB，请压缩后再试。';
+      return;
+    }
+    image = await readImageFile(file);
+  }
+  if (type === 'image' && !image) {
+    if (settingsStatus) settingsStatus.textContent = '图片类型需要填写图片链接或选择本地图片。';
+    return;
+  }
+
+  const nextItem = {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    type,
+    title: String(data.get('title') || '').trim(),
+    body: String(data.get('body') || '').trim(),
+    image,
+    date: new Intl.DateTimeFormat('zh-CN', { month: 'short', day: 'numeric' }).format(new Date())
+  };
+  const nextData = { ...siteData, contents: [nextItem, ...siteData.contents] };
+  if (!saveSiteData(nextData)) return;
+  contentForm.reset();
+  renderContents();
+  if (settingsStatus) settingsStatus.textContent = '新内容已添加到页面。';
+});
+
+settingsContentList?.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-remove-content]');
+  if (!button) return;
+  const item = siteData.contents.find(({ id }) => id === button.dataset.removeContent);
+  if (!item || !window.confirm(`删除“${item.title}”？`)) return;
+  const nextData = { ...siteData, contents: siteData.contents.filter(({ id }) => id !== item.id) };
+  if (!saveSiteData(nextData)) return;
+  renderContents();
+  if (settingsStatus) settingsStatus.textContent = '内容已删除。';
+});
+
+renderProfile();
+renderContents();

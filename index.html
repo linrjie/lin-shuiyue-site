@@ -30,8 +30,9 @@
       <nav aria-label="主导航">
         <a href="#blog-stage">Blog 舞台</a>
         <a href="#about">关于我</a>
-        <a href="#projects">随手记</a>
+        <a href="#projects">内容架</a>
         <a href="#contact">留言板</a>
+        <button class="settings-trigger" id="settings-trigger" type="button" aria-haspopup="dialog" aria-controls="site-settings">设置</button>
         <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换月色模式" aria-pressed="false">夜</button>
       </nav>
     </div>
@@ -69,36 +70,28 @@
     <section class="section about" id="about">
       <div>
         <p class="section-kicker"><span aria-hidden="true">◐</span> 水月档案</p>
-        <h2>月光下的<br />自我介绍</h2>
+        <h2>朋友视角的<br />关于我</h2>
       </div>
       <div class="about-copy">
-        <p>我是林水月。平时喜欢发现生活里那些微不足道、但会让人开心的小事。建这个网站没什么宏大理由——就是想让朋友来的时候，有个地方能多了解我一点。</p>
-        <div class="facts">
-          <span>🌙 偶尔熬夜</span><span>🎧 随时听歌</span><span>✨ 对世界好奇</span>
+        <p id="about-intro">我是林水月。平时喜欢发现生活里那些微不足道、但会让人开心的小事。建这个网站没什么宏大理由——就是想让朋友来的时候，有个地方能多了解我一点。</p>
+        <div class="profile-grid" aria-label="水月的个人档案">
+          <article><small>NOW · 最近在干嘛</small><strong id="profile-now"></strong></article>
+          <article><small>SNACK · 喜欢的零食</small><strong id="profile-snack"></strong></article>
+          <article><small>GOAL · 现在的目标</small><strong id="profile-goal"></strong></article>
+          <article><small>ANIME · 喜欢的动漫</small><strong id="profile-anime"></strong></article>
+          <article class="profile-wide"><small>XP · 偏好关键词</small><strong id="profile-xp"></strong></article>
         </div>
       </div>
     </section>
 
     <section class="section projects" id="projects">
-      <p class="section-kicker"><span aria-hidden="true">✦</span> 今晚掉落</p>
+      <p class="section-kicker"><span aria-hidden="true">✦</span> 水月的内容架</p>
       <div class="section-heading">
-        <h2>最近的生活碎片</h2>
-        <p>不定期更新，也可能突然消失。</p>
+        <h2>文章、笔记与相片</h2>
+        <p>想到什么就放进来，像朋友翻开一本没有目录的手账。</p>
       </div>
-      <div class="project-grid">
-        <article class="project-card card-yellow">
-          <div class="project-visual">NOW</div>
-          <div class="project-content"><p>NOW · 进行中</p><h3>亲手搭起这个小站</h3><span>今天也在添砖加瓦</span></div>
-        </article>
-        <article class="project-card card-blue">
-          <div class="project-visual">FAV</div>
-          <div class="project-content"><p>FAVORITE · 收藏夹</p><h3>最近喜欢的东西</h3><span>歌、电影和一些小玩意</span></div>
-        </article>
-        <article class="project-card card-coral">
-          <div class="project-visual">LOG</div>
-          <div class="project-content"><p>DAILY · 碎碎念</p><h3>生活掉落的碎片</h3><span>想起来就记一点</span></div>
-        </article>
-      </div>
+      <div class="project-grid content-grid" id="content-grid" aria-live="polite"></div>
+      <p class="content-empty" id="content-empty" hidden>内容架还是空的，去设置里放下第一张纸条吧。</p>
     </section>
 
     <section class="contact" id="contact">
@@ -121,6 +114,46 @@
   </main>
 
   <footer><p>© <span id="year"></span> 林水月的小站</p><p>写给朋友，也写给路过的你</p></footer>
+
+  <div class="settings-backdrop" id="settings-backdrop" hidden></div>
+  <aside class="settings-panel" id="site-settings" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-hidden="true">
+    <header class="settings-heading">
+      <div><small>LOCAL DESK</small><h2 id="settings-title">网页管理面板</h2></div>
+      <button id="settings-close" type="button" aria-label="关闭设置">×</button>
+    </header>
+    <p class="settings-note">修改只保存在这台设备的当前浏览器中。</p>
+
+    <form class="settings-form" id="profile-form">
+      <div class="settings-section-title"><span>关于我</span><small>PROFILE</small></div>
+      <label>自我介绍<textarea name="intro" rows="4" maxlength="240" required></textarea></label>
+      <div class="settings-fields">
+        <label>最近在干的事<input name="now" maxlength="48" required /></label>
+        <label>喜欢的零食<input name="snack" maxlength="48" required /></label>
+        <label>现在的目标<input name="goal" maxlength="48" required /></label>
+        <label>喜欢的动漫<input name="anime" maxlength="64" required /></label>
+      </div>
+      <label>XP / 偏好关键词<input name="xp" maxlength="80" required /></label>
+      <button class="settings-save" type="submit">保存关于我</button>
+    </form>
+
+    <form class="settings-form" id="content-form">
+      <div class="settings-section-title"><span>添加内容</span><small>CONTENT</small></div>
+      <div class="settings-fields">
+        <label>类型<select name="type"><option value="article">文章</option><option value="note">笔记</option><option value="image">图片</option></select></label>
+        <label>标题<input name="title" maxlength="60" required /></label>
+      </div>
+      <label>正文或图片说明<textarea name="body" rows="3" maxlength="300"></textarea></label>
+      <label>图片链接（图片类型可用）<input name="imageUrl" type="url" placeholder="https://…" /></label>
+      <label>或选择本地图片（不超过 900 KB）<input name="imageFile" type="file" accept="image/*" /></label>
+      <button class="settings-save" type="submit">添加到页面</button>
+    </form>
+
+    <section class="settings-items" aria-labelledby="settings-items-title">
+      <div class="settings-section-title"><span id="settings-items-title">管理现有内容</span><small id="settings-count"></small></div>
+      <div id="settings-content-list"></div>
+    </section>
+    <p class="settings-status" id="settings-status" role="status" aria-live="polite"></p>
+  </aside>
 
   <aside class="pet-console" id="pet-console" aria-label="芙宁娜小宠物控制台">
     <button class="console-handle" id="console-handle" type="button" aria-expanded="false" aria-controls="console-panel">

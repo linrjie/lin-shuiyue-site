@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const [url, selector, output = 'section-preview.png', widthArg = '1440', heightArg = '1000', waitArg = '700'] = process.argv.slice(2);
+const [url, selector, output = 'section-preview.png', widthArg = '1440', heightArg = '1000', waitArg = '700', clickSelector] = process.argv.slice(2);
 const viewportWidth = Number(widthArg);
 const viewportHeight = Number(heightArg);
 const settleTime = Number(waitArg);
@@ -84,6 +84,12 @@ try {
   });
   await call('Page.navigate', { url });
   await delay(700);
+  if (clickSelector) {
+    await call('Runtime.evaluate', {
+      expression: `document.querySelector(${JSON.stringify(clickSelector)})?.click()`
+    });
+    await delay(400);
+  }
   await call('Runtime.evaluate', {
     expression: `document.querySelector(${JSON.stringify(selector)})?.scrollIntoView({block:'start',behavior:'instant'})`
   });
