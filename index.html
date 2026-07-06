@@ -18,18 +18,23 @@
   <link rel="canonical" href="https://linrjie.github.io/lin-shuiyue-site/" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preload" href="assets/anime-hero.png" as="image" type="image/png" fetchpriority="high" />
+  <link rel="preload" href="assets/blog-stage-bg.png" as="image" type="image/png" />
   <link rel="preload" href="assets/furina-pet.png" as="image" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="site-header">
-    <a class="logo" href="#home" aria-label="返回首页">水月<span>的小站</span></a>
-    <nav aria-label="主导航">
-      <a href="#about">关于我</a>
-      <a href="#projects">随手记</a>
-      <a href="#contact">留言板</a>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换月色模式" aria-pressed="false">夜</button>
-    </nav>
+    <button class="nav-peek" id="nav-peek" type="button" aria-expanded="false" aria-label="展开网站导航"><span aria-hidden="true">✦</span> NAVIGATION</button>
+    <div class="nav-inner">
+      <a class="logo" href="#home" aria-label="返回首页">水月<span>的小站</span></a>
+      <nav aria-label="主导航">
+        <a href="#blog-stage">Blog 舞台</a>
+        <a href="#about">关于我</a>
+        <a href="#projects">随手记</a>
+        <a href="#contact">留言板</a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换月色模式" aria-pressed="false">夜</button>
+      </nav>
+    </div>
   </header>
 
   <main>
@@ -47,7 +52,18 @@
         </form>
         <p class="start-quote">“今晚的月色，也替我欢迎你。”</p>
       </div>
-      <a class="scroll-down" href="#about" aria-label="继续浏览关于我">向下看看 <span>↓</span></a>
+      <a class="scroll-down" href="#blog-stage" aria-label="前往 Blog 舞台">进入第二屏 <span>↓</span></a>
+    </section>
+
+    <section class="blog-stage" id="blog-stage" aria-labelledby="blog-stage-title">
+      <div class="blog-stage-overlay" aria-hidden="true"></div>
+      <div class="blog-stage-title">
+        <p>ANIME NOTES · NIGHT RADIO · DAILY LOG</p>
+        <h2 id="blog-stage-title">linshuiyue<span>の</span>blog</h2>
+        <small>一些兴趣、碎片和突然想记住的瞬间</small>
+      </div>
+      <div class="barrage-physics" id="barrage-physics" aria-hidden="true"></div>
+      <a class="blog-stage-next" href="#about">继续翻页 ↓</a>
     </section>
 
     <section class="section about" id="about">

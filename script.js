@@ -411,3 +411,184 @@ musicVolume?.addEventListener('input', () => {
   audio.volume = Number(musicVolume.value);
   saveMusicState();
 });
+
+const siteHeader = document.querySelector('.site-header');
+const navPeek = document.getElementById('nav-peek');
+
+navPeek?.addEventListener('click', () => {
+  const expanded = siteHeader?.classList.toggle('is-expanded') || false;
+  navPeek.setAttribute('aria-expanded', String(expanded));
+});
+
+siteHeader?.querySelectorAll('a').forEach((link) => {
+  link.addEventListener('click', () => {
+    siteHeader.classList.remove('is-expanded');
+    navPeek?.setAttribute('aria-expanded', 'false');
+  });
+});
+
+document.addEventListener('pointerdown', (event) => {
+  if (!siteHeader?.classList.contains('is-expanded') || siteHeader.contains(event.target)) return;
+  siteHeader.classList.remove('is-expanded');
+  navPeek?.setAttribute('aria-expanded', 'false');
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  siteHeader?.classList.remove('is-expanded');
+  navPeek?.setAttribute('aria-expanded', 'false');
+});
+
+const barrageContainer = document.getElementById('barrage-physics');
+const blogStage = document.getElementById('blog-stage');
+const barrageMessages = [
+  '月色很好', '正在施工', '听歌时间', '欢迎光临',
+  '灵感掉落', '记录生活', '随手记', '摸鱼中',
+  '别急，慢慢来', '朋友来过', '芙宁娜', '晚安',
+  '好奇心', '今日份开心', '水月のblog', '喵？',
+  '发呆五分钟', '收藏此刻'
+];
+const barrageTones = ['blue', 'pink', 'mint', 'yellow', 'violet'];
+let barrageBodies = [];
+let barrageFrame = 0;
+let barrageStarted = false;
+let barrageVisible = false;
+let lastPhysicsTime = 0;
+
+function createBarrageBodies() {
+  if (!barrageContainer || barrageStarted) return;
+  barrageStarted = true;
+  const width = barrageContainer.clientWidth;
+
+  barrageBodies = barrageMessages.map((message, index) => {
+    const element = document.createElement('span');
+    element.className = 'barrage-pill';
+    element.dataset.tone = barrageTones[index % barrageTones.length];
+    element.textContent = message;
+    barrageContainer.append(element);
+    const bodyWidth = element.offsetWidth;
+    const bodyHeight = element.offsetHeight;
+    const x = 14 + Math.random() * Math.max(1, width - bodyWidth - 28);
+    const y = -bodyHeight - index * (34 + Math.random() * 24);
+    return {
+      element,
+      x,
+      y,
+      width: bodyWidth,
+      height: bodyHeight,
+      vx: (Math.random() - 0.5) * 100,
+      vy: Math.random() * 30,
+      angle: (Math.random() - 0.5) * 20,
+      angularVelocity: (Math.random() - 0.5) * 60
+    };
+  });
+
+  if (prefersReducedMotion) {
+    const height = barrageContainer.clientHeight;
+    barrageBodies.forEach((body, index) => {
+      const columns = window.innerWidth < 700 ? 3 : 6;
+      const column = index % columns;
+      const row = Math.floor(index / columns);
+      body.x = 12 + column * ((width - body.width - 24) / Math.max(1, columns - 1));
+      body.y = Math.min(height - body.height - 50, 95 + row * 58);
+      body.element.style.transform = `translate3d(${body.x}px,${body.y}px,0) rotate(${body.angle * 0.35}deg)`;
+    });
+  }
+}
+
+function resolveBarrageCollisions() {
+  for (let i = 0; i < barrageBodies.length; i += 1) {
+    const a = barrageBodies[i];
+    for (let j = i + 1; j < barrageBodies.length; j += 1) {
+      const b = barrageBodies[j];
+      const overlapX = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+      const overlapY = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+      if (overlapX <= 0 || overlapY <= 0) continue;
+
+      if (overlapX < overlapY) {
+        const aLeft = a.x + a.width / 2 < b.x + b.width / 2;
+        const direction = aLeft ? -1 : 1;
+        a.x += direction * overlapX * 0.5;
+        b.x -= direction * overlapX * 0.5;
+        const velocity = a.vx;
+        a.vx = b.vx * 0.7;
+        b.vx = velocity * 0.7;
+      } else {
+        const aAbove = a.y + a.height / 2 < b.y + b.height / 2;
+        const direction = aAbove ? -1 : 1;
+        a.y += direction * overlapY * 0.5;
+        b.y -= direction * overlapY * 0.5;
+        const velocity = a.vy;
+        a.vy = b.vy * 0.58;
+        b.vy = velocity * 0.58;
+      }
+      a.angularVelocity += (Math.random() - 0.5) * 22;
+      b.angularVelocity += (Math.random() - 0.5) * 22;
+    }
+  }
+}
+
+function runBarragePhysics(timestamp) {
+  if (!barrageVisible || prefersReducedMotion || !barrageContainer) return;
+  const delta = Math.min(0.032, Math.max(0.008, (timestamp - lastPhysicsTime) / 1000 || 0.016));
+  lastPhysicsTime = timestamp;
+  const width = barrageContainer.clientWidth;
+  const floor = barrageContainer.clientHeight - 42;
+
+  barrageBodies.forEach((body) => {
+    body.vy += 760 * delta;
+    body.x += body.vx * delta;
+    body.y += body.vy * delta;
+    body.angle += body.angularVelocity * delta;
+
+    if (body.x < 8) {
+      body.x = 8;
+      body.vx = Math.abs(body.vx) * 0.62;
+    } else if (body.x + body.width > width - 8) {
+      body.x = width - body.width - 8;
+      body.vx = -Math.abs(body.vx) * 0.62;
+    }
+
+    if (body.y + body.height > floor) {
+      body.y = floor - body.height;
+      body.vy = Math.abs(body.vy) < 28 ? 0 : -Math.abs(body.vy) * 0.42;
+      body.vx *= 0.985;
+      body.angularVelocity *= 0.94;
+    }
+  });
+
+  resolveBarrageCollisions();
+  barrageBodies.forEach((body) => {
+    body.element.style.transform = `translate3d(${body.x}px,${body.y}px,0) rotate(${body.angle}deg)`;
+  });
+  barrageFrame = requestAnimationFrame(runBarragePhysics);
+}
+
+if (blogStage && barrageContainer) {
+  const barrageObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      barrageVisible = entry.isIntersecting;
+      if (entry.isIntersecting) {
+        createBarrageBodies();
+        if (!prefersReducedMotion) {
+          cancelAnimationFrame(barrageFrame);
+          lastPhysicsTime = performance.now();
+          barrageFrame = requestAnimationFrame(runBarragePhysics);
+        }
+      } else {
+        cancelAnimationFrame(barrageFrame);
+      }
+    });
+  }, { threshold: 0.25 });
+  barrageObserver.observe(blogStage);
+}
+
+window.addEventListener('resize', () => {
+  if (!barrageContainer || !barrageBodies.length) return;
+  const width = barrageContainer.clientWidth;
+  const floor = barrageContainer.clientHeight - 42;
+  barrageBodies.forEach((body) => {
+    body.x = Math.max(8, Math.min(body.x, width - body.width - 8));
+    body.y = Math.min(body.y, floor - body.height);
+  });
+});

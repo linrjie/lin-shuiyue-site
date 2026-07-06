@@ -2,9 +2,10 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const [url, selector, output = 'section-preview.png', widthArg = '1440', heightArg = '1000'] = process.argv.slice(2);
+const [url, selector, output = 'section-preview.png', widthArg = '1440', heightArg = '1000', waitArg = '700'] = process.argv.slice(2);
 const viewportWidth = Number(widthArg);
 const viewportHeight = Number(heightArg);
+const settleTime = Number(waitArg);
 if (!url || !selector) {
   throw new Error('Usage: node tools/capture-section.mjs <url> <selector> [output]');
 }
@@ -20,11 +21,12 @@ const edge = spawn(edgePath, [
   '--headless',
   '--disable-gpu',
   '--hide-scrollbars',
+  '--force-prefers-reduced-motion=no-preference',
   '--no-first-run',
   `--remote-debugging-port=${port}`,
   `--user-data-dir=${profilePath}`,
   `--window-size=${viewportWidth},${viewportHeight}`,
-  url
+  'about:blank'
 ], { stdio: 'ignore' });
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -77,11 +79,15 @@ try {
     deviceScaleFactor: 1,
     mobile: viewportWidth < 700
   });
+  await call('Emulation.setEmulatedMedia', {
+    features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }]
+  });
+  await call('Page.navigate', { url });
   await delay(700);
   await call('Runtime.evaluate', {
     expression: `document.querySelector(${JSON.stringify(selector)})?.scrollIntoView({block:'start',behavior:'instant'})`
   });
-  await delay(700);
+  await delay(settleTime);
   const screenshot = await call('Page.captureScreenshot', { format: 'png', fromSurface: true });
   fs.writeFileSync(path.resolve(output), Buffer.from(screenshot.data, 'base64'));
   console.log(path.resolve(output));
