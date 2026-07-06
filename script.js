@@ -446,7 +446,10 @@ const barrageMessages = [
   '灵感掉落', '记录生活', '随手记', '摸鱼中',
   '别急，慢慢来', '朋友来过', '芙宁娜', '晚安',
   '好奇心', '今日份开心', '水月のblog', '喵？',
-  '发呆五分钟', '收藏此刻'
+  '发呆五分钟', '收藏此刻', '今天也要开心', '灵感加载中',
+  '夜猫子', '再看一集', '发呆也是正事', '小站施工队',
+  '来杯可乐', '收藏快乐', '保持好奇', '水神巡演',
+  '摸鱼批准', '下次见'
 ];
 const barrageTones = ['blue', 'pink', 'mint', 'yellow', 'violet'];
 let barrageBodies = [];
@@ -454,13 +457,15 @@ let barrageFrame = 0;
 let barrageStarted = false;
 let barrageVisible = false;
 let lastPhysicsTime = 0;
+let barrageElapsed = 0;
 
 function createBarrageBodies() {
   if (!barrageContainer || barrageStarted) return;
   barrageStarted = true;
   const width = barrageContainer.clientWidth;
+  const visibleMessages = window.innerWidth < 700 ? barrageMessages.slice(0, 16) : barrageMessages;
 
-  barrageBodies = barrageMessages.map((message, index) => {
+  barrageBodies = visibleMessages.map((message, index) => {
     const element = document.createElement('span');
     element.className = 'barrage-pill';
     element.dataset.tone = barrageTones[index % barrageTones.length];
@@ -469,18 +474,21 @@ function createBarrageBodies() {
     const bodyWidth = element.offsetWidth;
     const bodyHeight = element.offsetHeight;
     const x = 14 + Math.random() * Math.max(1, width - bodyWidth - 28);
-    const y = -bodyHeight - index * (34 + Math.random() * 24);
-    return {
+    const body = {
       element,
       x,
-      y,
+      y: -bodyHeight - 8,
       width: bodyWidth,
       height: bodyHeight,
-      vx: (Math.random() - 0.5) * 100,
-      vy: Math.random() * 30,
+      vx: (Math.random() - 0.5) * 76,
+      vy: 0,
       angle: (Math.random() - 0.5) * 20,
-      angularVelocity: (Math.random() - 0.5) * 60
+      angularVelocity: (Math.random() - 0.5) * 48,
+      dropAt: index * 125 + Math.random() * 150,
+      active: false
     };
+    element.style.transform = `translate3d(${body.x}px,${body.y}px,0) rotate(${body.angle}deg)`;
+    return body;
   });
 
   if (prefersReducedMotion) {
@@ -491,40 +499,71 @@ function createBarrageBodies() {
       const row = Math.floor(index / columns);
       body.x = 12 + column * ((width - body.width - 24) / Math.max(1, columns - 1));
       body.y = Math.min(height - body.height - 50, 95 + row * 58);
+      body.active = true;
+      body.element.classList.add('is-active');
       body.element.style.transform = `translate3d(${body.x}px,${body.y}px,0) rotate(${body.angle * 0.35}deg)`;
     });
   }
 }
 
-function resolveBarrageCollisions() {
-  for (let i = 0; i < barrageBodies.length; i += 1) {
-    const a = barrageBodies[i];
-    for (let j = i + 1; j < barrageBodies.length; j += 1) {
-      const b = barrageBodies[j];
-      const overlapX = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
-      const overlapY = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
-      if (overlapX <= 0 || overlapY <= 0) continue;
+function constrainBarrageBody(body, width, floor) {
+  if (body.x < 8) {
+    body.x = 8;
+    body.vx = Math.abs(body.vx) * 0.5;
+  } else if (body.x + body.width > width - 8) {
+    body.x = width - body.width - 8;
+    body.vx = -Math.abs(body.vx) * 0.5;
+  }
+  if (body.y + body.height > floor) {
+    body.y = floor - body.height;
+    body.vy = Math.abs(body.vy) < 34 ? 0 : -Math.abs(body.vy) * 0.28;
+    body.vx *= 0.96;
+    body.angularVelocity *= 0.88;
+  }
+}
 
-      if (overlapX < overlapY) {
-        const aLeft = a.x + a.width / 2 < b.x + b.width / 2;
-        const direction = aLeft ? -1 : 1;
-        a.x += direction * overlapX * 0.5;
-        b.x -= direction * overlapX * 0.5;
-        const velocity = a.vx;
-        a.vx = b.vx * 0.7;
-        b.vx = velocity * 0.7;
-      } else {
-        const aAbove = a.y + a.height / 2 < b.y + b.height / 2;
-        const direction = aAbove ? -1 : 1;
-        a.y += direction * overlapY * 0.5;
-        b.y -= direction * overlapY * 0.5;
-        const velocity = a.vy;
-        a.vy = b.vy * 0.58;
-        b.vy = velocity * 0.58;
+function resolveBarrageCollisions(width, floor) {
+  for (let pass = 0; pass < 5; pass += 1) {
+    for (let i = 0; i < barrageBodies.length; i += 1) {
+      const a = barrageBodies[i];
+      if (!a.active) continue;
+      for (let j = i + 1; j < barrageBodies.length; j += 1) {
+        const b = barrageBodies[j];
+        if (!b.active) continue;
+        const overlapX = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+        const overlapY = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+        if (overlapX <= 0 || overlapY <= 0) continue;
+
+        if (overlapX < overlapY) {
+          const normal = a.x + a.width / 2 < b.x + b.width / 2 ? 1 : -1;
+          a.x -= normal * overlapX * 0.51;
+          b.x += normal * overlapX * 0.51;
+          const relativeVelocity = (b.vx - a.vx) * normal;
+          if (relativeVelocity < 0) {
+            const impulse = -relativeVelocity * 0.68;
+            a.vx -= impulse * normal;
+            b.vx += impulse * normal;
+          }
+        } else {
+          const normal = a.y + a.height / 2 < b.y + b.height / 2 ? 1 : -1;
+          a.y -= normal * overlapY * 0.51;
+          b.y += normal * overlapY * 0.51;
+          const relativeVelocity = (b.vy - a.vy) * normal;
+          if (relativeVelocity < 0) {
+            const impulse = -relativeVelocity * 0.58;
+            a.vy -= impulse * normal;
+            b.vy += impulse * normal;
+          }
+          a.vx *= 0.985;
+          b.vx *= 0.985;
+        }
+        a.angularVelocity += (b.vx - a.vx) * 0.035;
+        b.angularVelocity -= (b.vx - a.vx) * 0.035;
       }
-      a.angularVelocity += (Math.random() - 0.5) * 22;
-      b.angularVelocity += (Math.random() - 0.5) * 22;
     }
+    barrageBodies.forEach((body) => {
+      if (body.active) constrainBarrageBody(body, width, floor);
+    });
   }
 }
 
@@ -534,30 +573,29 @@ function runBarragePhysics(timestamp) {
   lastPhysicsTime = timestamp;
   const width = barrageContainer.clientWidth;
   const floor = barrageContainer.clientHeight - 42;
+  const steps = delta > 0.02 ? 2 : 1;
+  const step = delta / steps;
+  barrageElapsed += delta * 1000;
 
   barrageBodies.forEach((body) => {
-    body.vy += 760 * delta;
-    body.x += body.vx * delta;
-    body.y += body.vy * delta;
-    body.angle += body.angularVelocity * delta;
-
-    if (body.x < 8) {
-      body.x = 8;
-      body.vx = Math.abs(body.vx) * 0.62;
-    } else if (body.x + body.width > width - 8) {
-      body.x = width - body.width - 8;
-      body.vx = -Math.abs(body.vx) * 0.62;
-    }
-
-    if (body.y + body.height > floor) {
-      body.y = floor - body.height;
-      body.vy = Math.abs(body.vy) < 28 ? 0 : -Math.abs(body.vy) * 0.42;
-      body.vx *= 0.985;
-      body.angularVelocity *= 0.94;
+    if (!body.active && barrageElapsed >= body.dropAt) {
+      body.active = true;
+      body.element.classList.add('is-active');
     }
   });
 
-  resolveBarrageCollisions();
+  for (let substep = 0; substep < steps; substep += 1) {
+    barrageBodies.forEach((body) => {
+      if (!body.active) return;
+      body.vy += 880 * step;
+      body.x += body.vx * step;
+      body.y += body.vy * step;
+      body.angle += body.angularVelocity * step;
+      constrainBarrageBody(body, width, floor);
+    });
+    resolveBarrageCollisions(width, floor);
+  }
+
   barrageBodies.forEach((body) => {
     body.element.style.transform = `translate3d(${body.x}px,${body.y}px,0) rotate(${body.angle}deg)`;
   });

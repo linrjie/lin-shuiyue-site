@@ -474,8 +474,12 @@ nav a:hover::after { width: 100%; }
   font-size: 0.76rem;
   font-weight: 900;
   white-space: nowrap;
+  opacity: 0;
   will-change: transform;
+  transition: opacity 0.14s ease;
 }
+
+.barrage-pill.is-active { opacity: 1; }
 
 .barrage-pill[data-tone="pink"] { background: rgba(255, 207, 225, 0.95); }
 .barrage-pill[data-tone="blue"] { background: rgba(196, 224, 255, 0.95); }
