@@ -8,3 +8,6 @@ lin-shuiyue-site.zip
 *-preview.png
 design-*.png
 tmp/
+node_modules/
+dist/
+.astro/

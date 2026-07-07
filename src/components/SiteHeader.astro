@@ -1,0 +1,18 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<header class="site-header">
+  <button class="nav-peek" id="nav-peek" type="button" aria-expanded="false" aria-label="展开网站导航"><span aria-hidden="true">✦</span> NAVIGATION</button>
+  <div class="nav-inner">
+    <a class="logo" href={`${base}#home`} aria-label="返回首页">水月<span>的小站</span></a>
+    <nav aria-label="主导航">
+      <a href={`${base}#blog-stage`}>Blog 舞台</a>
+      <a href={`${base}#about`}>关于我</a>
+      <a href={`${base}#projects`}>内容架</a>
+      <a href={`${base}#contact`}>留言板</a>
+      <button class="settings-trigger" id="settings-trigger" type="button" aria-haspopup="dialog" aria-controls="site-settings">设置</button>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换月色模式" aria-pressed="false">夜</button>
+    </nav>
+  </div>
+</header>

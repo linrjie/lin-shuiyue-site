@@ -1,0 +1,31 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import PetConsole from '../components/PetConsole.astro';
+import SettingsPanel from '../components/SettingsPanel.astro';
+import '../styles/post.css';
+
+const { title, description, publishDate, tags = [], cover } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const date = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'long' }).format(publishDate);
+---
+
+<BaseLayout title={`${title} · 林水月的小站`} description={description} image={cover?.src}>
+  <SiteHeader />
+  <main class="post-page">
+    <article class="post-shell">
+      <a class="post-back" href={`${base}blog/`}>← 回到内容架</a>
+      <header class="post-header">
+        <p>{date}</p>
+        <h1>{title}</h1>
+        <span>{description}</span>
+        {tags.length > 0 && <ul class="post-tags">{tags.map((tag: string) => <li>{tag}</li>)}</ul>}
+      </header>
+      {cover && <img class="post-cover" src={cover.src} alt={title} />}
+      <div class="post-content"><slot /></div>
+    </article>
+  </main>
+  <footer><p>© <span id="year"></span> 林水月的小站</p><p>写给朋友，也写给路过的你</p></footer>
+  <SettingsPanel />
+  <PetConsole />
+</BaseLayout>

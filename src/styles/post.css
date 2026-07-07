@@ -1,0 +1,38 @@
+.post-page {
+  min-height: 100vh;
+  padding: 110px clamp(20px, 7vw, 110px) 90px;
+}
+
+.post-shell {
+  width: min(880px, 100%);
+  margin: 0 auto;
+}
+
+.post-back {
+  color: var(--hydro-deep);
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.post-header { margin: 42px 0; }
+.post-header > p { color: var(--hydro-deep); font-family: var(--font-data); font-size: 0.72rem; font-weight: 800; }
+.post-header h1 { margin: 10px 0 18px; font-family: var(--font-display); font-size: clamp(3.2rem, 8vw, 7rem); line-height: 0.96; letter-spacing: -0.05em; }
+.post-header > span { display: block; max-width: 650px; color: var(--muted); font-size: 1rem; }
+
+.post-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+.post-tags li { padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 0.72rem; font-weight: 700; }
+
+.post-cover { display: block; width: 100%; height: auto; margin: 0 0 46px; border-radius: 24px; box-shadow: var(--shadow); }
+.post-content { padding: clamp(26px, 5vw, 54px); border: 1px solid var(--line); border-radius: 28px 28px 28px 6px; background: var(--surface); box-shadow: var(--shadow); font-size: 1rem; line-height: 1.9; }
+.post-content :first-child { margin-top: 0; }
+.post-content :last-child { margin-bottom: 0; }
+.post-content h2 { margin-top: 2.2em; font-family: var(--font-display); font-size: 2rem; line-height: 1.2; }
+.post-content a { color: var(--hydro-deep); }
+
+@media (max-width: 700px) {
+  .post-page { padding: 88px 20px 70px; }
+  .post-header { margin: 32px 0; }
+  .post-content { border-radius: 22px 22px 22px 5px; }
+}

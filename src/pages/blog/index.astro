@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import ContentShelf from '../../components/ContentShelf.astro';
+import PetConsole from '../../components/PetConsole.astro';
+import SettingsPanel from '../../components/SettingsPanel.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+---
+
+<BaseLayout title="内容架 · 林水月的小站" description="林水月写下的文章、笔记与相片。">
+  <SiteHeader />
+  <main class="blog-index"><ContentShelf posts={posts} /></main>
+  <footer><p>© <span id="year"></span> 林水月的小站</p><p>写给朋友，也写给路过的你</p></footer>
+  <SettingsPanel />
+  <PetConsole />
+</BaseLayout>

@@ -7,7 +7,7 @@
   --hydro-deep: #416dca;
   --iris: #9b8cff;
   --ink: #18223f;
-  --muted: #647297;
+  --muted: #526183;
   --page: #eaf1ff;
   --surface: rgba(248, 251, 255, 0.82);
   --surface-solid: #f8fbff;
@@ -227,7 +227,7 @@ nav a:hover::after { width: 100%; }
   overflow: hidden;
   color: white;
   text-align: center;
-  background-image: url("assets/anime-hero.png");
+  background-image: var(--hero-image);
   background-position: center;
   background-size: cover;
 }
@@ -380,7 +380,7 @@ nav a:hover::after { width: 100%; }
   overflow: hidden;
   isolation: isolate;
   color: white;
-  background-image: url("assets/blog-stage-bg.png");
+  background-image: var(--stage-image);
   background-position: center;
   background-size: cover;
   scroll-margin-top: 0;
@@ -486,6 +486,26 @@ nav a:hover::after { width: 100%; }
 .barrage-pill[data-tone="mint"] { background: rgba(195, 242, 226, 0.95); }
 .barrage-pill[data-tone="yellow"] { background: rgba(255, 234, 158, 0.96); }
 .barrage-pill[data-tone="violet"] { background: rgba(222, 207, 255, 0.95); }
+
+.barrage-replay {
+  position: absolute;
+  z-index: 5;
+  top: 84px;
+  right: 4vw;
+  padding: 9px 13px;
+  border: 1px solid rgba(225, 235, 255, 0.42);
+  border-radius: 999px;
+  color: rgba(245, 248, 255, 0.9);
+  background: rgba(8, 18, 46, 0.48);
+  font-family: var(--font-data);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.barrage-replay:hover { background: rgba(71, 103, 176, 0.72); }
 
 .blog-stage-next {
   position: absolute;
@@ -735,6 +755,8 @@ nav a:hover::after { width: 100%; }
   display: flex;
   min-height: 330px;
   flex-direction: column;
+  color: inherit;
+  text-decoration: none;
 }
 
 .content-card .project-visual {
@@ -777,6 +799,18 @@ nav a:hover::after { width: 100%; }
   color: var(--muted);
   text-align: center;
 }
+
+.content-more {
+  display: inline-block;
+  margin-top: 28px;
+  color: var(--hydro-deep);
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.blog-index { min-height: 100vh; padding-top: 48px; }
 
 /* Local page manager */
 .settings-backdrop {
@@ -1018,6 +1052,14 @@ body.settings-open { overflow: hidden; }
 
 .guestbook-form .button { justify-self: start; }
 
+.guestbook-status {
+  min-height: 1.5em;
+  margin: 0;
+  color: #c8d8ff;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
 .guestbook-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1129,7 +1171,7 @@ footer {
 .console-title strong { font-size: 1rem; }
 
 .console-title small {
-  color: #617198;
+  color: var(--muted);
   font-family: var(--font-data);
   font-size: 0.57rem;
   font-weight: 800;
@@ -1216,7 +1258,7 @@ footer {
 
 .console-tip {
   margin: 12px 0 0;
-  color: #7784a6;
+  color: var(--muted);
   font-size: 0.67rem;
 }
 
@@ -1244,7 +1286,7 @@ footer {
 .music-now > div { display: grid; gap: 1px; }
 
 .music-now small {
-  color: #6d7b9e;
+  color: var(--muted);
   font-family: var(--font-data);
   font-size: 0.54rem;
   font-weight: 800;
@@ -1272,7 +1314,7 @@ footer {
   display: flex;
   justify-content: space-between;
   margin-top: 1px;
-  color: #7180a3;
+  color: var(--muted);
   font-family: var(--font-data);
   font-size: 0.58rem;
   font-weight: 700;

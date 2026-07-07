@@ -1,0 +1,12 @@
+<section class="contact" id="contact">
+  <p class="section-kicker"><span aria-hidden="true">✎</span> 来访簿</p>
+  <h2>留下一句，<br /><span>证明你来过。</span></h2>
+  <p class="guestbook-note">留言会保存在当前浏览器里，适合把电脑递给朋友时一起玩。</p>
+  <form class="guestbook-form" id="guestbook-form">
+    <label><span>怎么称呼你</span><input id="guest-name" name="name" maxlength="16" placeholder="一位神秘朋友" /></label>
+    <label><span>想说点什么</span><textarea id="guest-message" name="message" maxlength="120" rows="3" placeholder="水月，我来过啦……" required></textarea></label>
+    <button class="button primary" type="submit">贴到留言板上</button>
+    <p class="guestbook-status" id="guestbook-status" role="status" aria-live="polite"></p>
+  </form>
+  <div class="guestbook-list" id="guestbook-list" aria-live="polite"></div>
+</section>

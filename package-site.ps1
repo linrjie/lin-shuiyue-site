@@ -2,22 +2,23 @@ $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $outputPath = Join-Path $projectRoot 'lin-shuiyue-site.zip'
-$siteFiles = @(
-  'index.html',
-  'styles.css',
-  'script.js',
-  'favicon.svg',
-  'assets'
-) | ForEach-Object { Join-Path $projectRoot $_ }
+$distPath = Join-Path $projectRoot 'dist'
 
-$missingFiles = $siteFiles | Where-Object { -not (Test-Path -LiteralPath $_) }
-if ($missingFiles) {
-  throw "缺少网站文件：$($missingFiles -join ', ')"
+Push-Location $projectRoot
+try {
+  npm run build
+  if ($LASTEXITCODE -ne 0) { throw 'Astro build failed.' }
+} finally {
+  Pop-Location
+}
+
+if (-not (Test-Path -LiteralPath $distPath)) {
+  throw "Missing build directory: $distPath"
 }
 
 if (Test-Path -LiteralPath $outputPath) {
   Remove-Item -LiteralPath $outputPath -Force
 }
 
-Compress-Archive -LiteralPath $siteFiles -DestinationPath $outputPath -CompressionLevel Optimal
-Write-Output "已生成：$outputPath"
+Compress-Archive -Path (Join-Path $distPath '*') -DestinationPath $outputPath -CompressionLevel Optimal
+Write-Output "Created: $outputPath"

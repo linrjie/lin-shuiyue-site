@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { posts: CollectionEntry<'blog'>[] }
+const { posts } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const labels = { article: 'ARTICLE · 文章', note: 'NOTE · 笔记', image: 'IMAGE · 图片' };
+const visuals = { article: 'READ', note: 'NOTE', image: 'IMG' };
+const formatDate = (date: Date) => new Intl.DateTimeFormat('zh-CN', { month: 'short', day: 'numeric' }).format(date);
+---
+
+<section class="section projects" id="projects">
+  <p class="section-kicker"><span aria-hidden="true">✦</span> 水月的内容架</p>
+  <div class="section-heading"><h2>文章、笔记与相片</h2><p>想到什么就放进来，像朋友翻开一本没有目录的手账。</p></div>
+  <div class="project-grid content-grid" id="content-grid">
+    {posts.map((post) => (
+      <a class="project-card content-card" data-type={post.data.type} href={`${base}blog/${post.id}/`}>
+        <div class="project-visual">
+          {post.data.cover ? <img src={post.data.cover.src} alt={post.data.title} loading="lazy" /> : visuals[post.data.type]}
+        </div>
+        <div class="project-content">
+          <p>{labels[post.data.type]} · {formatDate(post.data.publishDate)}</p>
+          <h3>{post.data.title}</h3>
+          <span>{post.data.description}</span>
+        </div>
+      </a>
+    ))}
+  </div>
+  {posts.length === 0 && <p class="content-empty">内容架还是空的，去写下第一篇 Markdown 吧。</p>}
+  <a class="content-more" href={`${base}blog/`}>查看全部内容 →</a>
+</section>

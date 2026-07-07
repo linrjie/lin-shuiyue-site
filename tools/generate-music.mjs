@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const sampleRate = 22050;
 const duration = 48;
-const outputDir = path.resolve('assets/music');
+const outputDir = path.resolve('src/assets/music');
 
 const tracks = [
   {
