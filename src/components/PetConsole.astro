@@ -1,0 +1,36 @@
+---
+import petImage from '../assets/images/furina-pet.png';
+---
+
+<aside class="pet-console" id="pet-console" aria-label="芙宁娜小宠物控制台">
+  <button class="console-handle" id="console-handle" type="button" aria-expanded="false" aria-controls="console-panel"><span aria-hidden="true">✦</span><span class="sr-only">打开宠物控制台</span></button>
+  <div class="console-panel" id="console-panel">
+    <div class="console-title"><span class="console-orb" aria-hidden="true"></span><div><strong>水神小助手</strong><small>PET CONSOLE</small></div></div>
+    <p class="console-status" id="pet-status">芙宁娜正在欣赏月色。</p>
+    <section class="music-console" aria-label="背景音乐播放器">
+      <div class="music-now"><span class="music-disc" aria-hidden="true">♪</span><div><small>NOW PLAYING</small><strong id="music-title">月下漫游</strong></div></div>
+      <input class="music-progress" id="music-progress" type="range" min="0" max="48" value="0" step="0.1" aria-label="播放进度" />
+      <div class="music-time"><span id="music-current">0:00</span><span id="music-duration">0:48</span></div>
+      <div class="music-controls">
+        <button id="music-prev" type="button" aria-label="上一首">‹</button>
+        <button class="music-play" id="music-play" type="button" aria-label="播放">▶</button>
+        <button id="music-next" type="button" aria-label="下一首">›</button>
+      </div>
+      <label class="music-volume" for="music-volume"><span aria-hidden="true">♩</span><input id="music-volume" type="range" min="0" max="1" value="0.55" step="0.01" aria-label="音量" /></label>
+      <audio id="pet-audio" preload="metadata"></audio>
+    </section>
+    <div class="console-actions">
+      <button type="button" data-pet-action="speak">说句话</button>
+      <button type="button" data-pet-action="wander">随便走走</button>
+      <button type="button" data-pet-action="reset">回到原位</button>
+      <button type="button" data-pet-action="toggle">暂时隐藏</button>
+    </div>
+    <label class="pet-size-control" for="pet-size">宠物大小<input id="pet-size" type="range" min="110" max="240" value="170" /></label>
+    <p class="console-tip">可以直接拖动她，点击也会有回应。</p>
+  </div>
+</aside>
+
+<div class="site-pet" id="site-pet" role="button" tabindex="0" aria-label="芙宁娜小宠物，可以拖动或点击">
+  <div class="pet-speech" id="pet-speech" role="status" aria-live="polite">欢迎来到水月的小站！</div>
+  <img src={petImage.src} alt="芙宁娜风格的蓝白色可爱小宠物" draggable="false" />
+</div>

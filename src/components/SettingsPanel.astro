@@ -1,0 +1,25 @@
+<div class="settings-backdrop" id="settings-backdrop" hidden></div>
+<aside class="settings-panel" id="site-settings" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-hidden="true" inert>
+  <header class="settings-heading">
+    <div><small>LOCAL DESK</small><h2 id="settings-title">网页管理面板</h2></div>
+    <button id="settings-close" type="button" aria-label="关闭设置">×</button>
+  </header>
+  <p class="settings-note">个人档案修改只保存在这台设备的当前浏览器中。</p>
+  <form class="settings-form" id="profile-form">
+    <div class="settings-section-title"><span>关于我</span><small>PROFILE</small></div>
+    <label>自我介绍<textarea name="intro" rows="4" maxlength="240" required></textarea></label>
+    <div class="settings-fields">
+      <label>最近在干的事<input name="now" maxlength="48" required /></label>
+      <label>喜欢的零食<input name="snack" maxlength="48" required /></label>
+      <label>现在的目标<input name="goal" maxlength="48" required /></label>
+      <label>喜欢的动漫<input name="anime" maxlength="64" required /></label>
+    </div>
+    <label>XP / 偏好关键词<input name="xp" maxlength="80" required /></label>
+    <button class="settings-save" type="submit">保存关于我</button>
+  </form>
+  <section class="settings-items" aria-labelledby="publish-title">
+    <div class="settings-section-title"><span id="publish-title">公开内容</span><small>MARKDOWN</small></div>
+    <p class="settings-note">文章、笔记和图片现在统一放在 <code>src/content/blog</code> 中，构建后所有访客都能看到。</p>
+  </section>
+  <p class="settings-status" id="settings-status" role="status" aria-live="polite"></p>
+</aside>
